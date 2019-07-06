@@ -1,0 +1,50 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+from sklearn.metrics import adjusted_rand_score
+
+import re
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from scipy.spatial.distance import pdist
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
+
+
+documents = ["Selamat Hari Keluarga Nasional, 29 juni 2019.",
+             "Stasiun Bandara Kualanamu dalah stasiun kereta api yang berada di Aceh.",
+             "29 Juni yang ditetapkan sebagai Hari Keluarga Nasional.",
+             "Stasiun Bandara Kuala Namu memiliki arsitektur modern, serba kaca, dan minimalis.",
+             "menjadi momen tepat untuk mengingatkan betapa pentingnya keluarga..",
+             "Stasiun ini letaknya sekompleks dengan bandara tersebut.",
+             "Semoga keluarga kalian tetap memberikan kasih sayang dan cinta yg luar biasa.",
+	     "Stasiun ini saat ini melayani perjalanan KA Bandara ARS dari dan ke Stasiun Medan.",
+	     "Selamat memperingati Hari Keluarga Nasional Teman Sehat.",
+	     "Kamu bisa merasakan sensasi naik kereta seperti naik pesawat jika kamu transit di stasiun ini.",
+	     "Kesehatan keluarga adalah tanggung jawab kita bersama.",
+             "Kereta api berangkat dan tiba di peron khusus kereta bandara di Stasiun Medan."]
+
+tfidf = TfidfVectorizer(stop_words='english')
+X = tfidf.fit_transform(documents).todense()
+# transform the data matrix into pairwise distances list
+dist_array = pdist(X)
+# calculate hierarchy
+#Z = linkage(dist_array, 'ward')
+#plt.title("Ward")
+#dendrogram(Z, labels=labels)
+
+import scipy.cluster.hierarchy as sch
+dendrogram = sch.dendrogram(sch.linkage(X, method = 'ward'))
+plt.title('Dendrogram')
+plt.xlabel('Nomor Dokumen')
+plt.ylabel('Jarak Euclidean')
+plt.show()
+
+
+from sklearn.cluster import AgglomerativeClustering
+
+cluster = AgglomerativeClustering(n_clusters=2, affinity='euclidean', linkage='ward')  
+cluster.fit_predict(X) 
+print(cluster.labels_)  
+  
